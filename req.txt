@@ -4,3 +4,7 @@ onnxruntime-directml==1.21.0
 onnxruntime-genai==0.7.0
 onnxruntime-genai-directml==0.7.0
 onnxscript
+transformers
+torch
+torch-directml 
+gguf
