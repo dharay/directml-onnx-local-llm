@@ -5,6 +5,7 @@ import time
 import numpy as np 
 import os
 os.environ["PROCESSOR_ARCHITECTURE"] = "AMD64"
+
 def main(args):
     if args.verbose: print("Loading model...")
     if args.timings:
@@ -57,6 +58,9 @@ def main(args):
             args.chat_template = '{system_prompt}<|im_start|>user\n{input}<|im_end|>\n<|im_start|>assistant\n'
         elif model_type == "gemma3_text":
             args.chat_template = '<start_of_turn>user\n{system_prompt}{input}<end_of_turn>\n<start_of_turn>model\n'
+        elif model_type == "gemma2":
+            args.chat_template = '<start_of_turn>user\n {{ end }}{{ .Prompt }}<end_of_turn>\n<start_of_turn>model\n{{ .Response }}<end_of_turn>'
+
         else:
             raise ValueError(f"Chat Template for model type {model_type} is not known. Please provide chat template using --chat_template")
 
@@ -76,6 +80,8 @@ def main(args):
             system_prompt = f"<|im_start|>system\n{args.system_prompt}<|im_end|>\n"
         elif model_type == "gemma3_text":
             system_prompt = f"{args.system_prompt}"
+        elif model_type == "gemma2":
+            None
         else:
             system_prompt = args.system_prompt
 
@@ -96,14 +102,20 @@ def main(args):
 
         # prompt = f'{args.chat_template.format(system_prompt=system_prompt, input=text)}'
         input_tokens = tokenizer.encode(text)
-        system_tokens = tokenizer.encode(system_prompt)
+        try:
+            system_tokens = tokenizer.encode(system_prompt)
+        except:
+            None
         params = og.GeneratorParams(model)
         params.set_search_options(**search_options)
         generator = og.Generator(model, params)
         if args.verbose: print("Generator created")
 
         # Append system and input tokens to the generator
-        generator.append_tokens(np.concatenate([system_tokens, input_tokens]))
+        try:
+            generator.append_tokens(np.concatenate([system_tokens, input_tokens]))
+        except:
+            generator.append_tokens(np.concatenate([ input_tokens]))
 
         if args.verbose: print("Running generation loop ...")
         if args.timings:
