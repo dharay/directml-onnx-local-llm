@@ -2,6 +2,7 @@
 ## setup
 .venv/scripts/activate
 pip install -r req.txt
+!!! use --pre flag for onnxrtgenai package
 
 ## compatible models:
 https://huggingface.co/models?other=DML&sort=created
@@ -12,7 +13,7 @@ python onnxApp.py -m models\directml-int4-awq-block-128 -e dml
 python onnxApp.py -m models\phi3vfp16 -e dml
 
 
-huggingface-cli download microsoft/Phi-3-mini-4k-instruct-onnx --include directml/* --local-dir .
+huggingface-cli download microsoft/Phi-3-mini-4k-instruct-onnx --include directml/* --local-dir ./models/
 
 ## WIP
 converting gguf or safetensors to onnx dml
